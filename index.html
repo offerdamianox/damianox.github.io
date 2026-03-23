@@ -1,90 +1,160 @@
 <!DOCTYPE html>
 <html lang="pl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DamianoxWeb - Earn</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DamianoxWeb - Earn Points</title>
+    <link rel="manifest" href="manifest.json">
+    
+    <style>
+        /* Spójność z głównym stylem Hubu */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
 
-  <link rel="manifest" href="manifest.json">
-  
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f5f7fa;
-      color: #333;
-      margin: 0;
-    }
+        body {
+            background-color: #0f0f13;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-    .container {
-      max-width: 900px;
-      margin: 20px auto;
-      padding: 10px;
-    }
+        /* Tło z poświatą */
+        .background-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 50% 10%, #1e1e2e 0%, #0f0f13 100%);
+            z-index: -1;
+        }
 
-    header {
-      text-align: center;
-      margin-bottom: 20px;
-    }
+        .container {
+            max-width: 1000px;
+            width: 95%;
+            margin: 40px auto;
+            padding: 20px;
+        }
 
-    header h1 {
-      color: #4caf50;
-    }
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 20px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
 
-    iframe {
-      border: none;
-      border-radius: 10px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
-      width: 100%;
-      height: 600px;
-    }
+        header h1 {
+            font-size: 2rem;
+            background: linear-gradient(90deg, #00ff88, #00ccff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
 
-    footer {
-      text-align: center;
-      margin-top: 30px;
-      color: #888;
-      font-size: 14px;
-    }
-  </style>
+        .balance-box {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        #balance {
+            color: #00ff88;
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+
+        /* Stylizacja Offerwall (AdGem) */
+        .iframe-wrapper {
+            position: relative;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 20px;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        iframe {
+            border: none;
+            border-radius: 15px;
+            width: 100%;
+            height: 700px; /* Zwiększyłem wysokość dla lepszej wygody */
+            display: block;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #555;
+            font-size: 0.8rem;
+            padding-bottom: 20px;
+        }
+
+        /* Animacja pulsowania przy ładowaniu */
+        .loading {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.5; }
+            50% { opacity: 1; }
+            100% { opacity: 0.5; }
+        }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>💎 Twoje punkty</h1>
-      <p>Saldo: <span id="balance">Ładowanie...</span></p>
-    </header>
+    <div class="background-glow"></div>
 
-    <main>
-      <!-- AdGem iframe -->
-      <iframe id="offerwall" src=""></iframe>
-    </main>
+    <div class="container">
+        <header>
+            <h1>💎 Twoje Punkty</h1>
+            <div class="balance-box">
+                Saldo: <span id="balance" class="loading">Ładowanie...</span>
+            </div>
+        </header>
 
-    <footer>© 2026 Damianox</footer>
-  </div>
+        <main class="iframe-wrapper">
+            <iframe id="offerwall" src=""></iframe>
+        </main>
 
-  <script>
-    // Twój Supabase projekt
-    const supabaseUrl = "https://retwfjodylxmdqxhupbz.supabase.co";
-    const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJldHdmam9keWx4bWRxeGh1cGJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyMjkwOTIsImV4cCI6MjA4OTgwNTA5Mn0.GpuCY3K2yeepTek0yPWRC1SEotUetDO9NJgr95OnPYw"; // z API Keys → anon key
-    const userId = "damianox"; // identyfikator użytkownika w Supabase i AdGem
+        <footer>© 2026 Damianox | System Punktowy</footer>
+    </div>
 
-    // 1️⃣ Pobierz saldo użytkownika z Supabase
-    async function loadBalance() {
-      const res = await fetch(`${supabaseUrl}/rest/v1/users?id=eq.${userId}`, {
-        headers: {
-          apikey: supabaseAnonKey,
-          "Authorization": `Bearer ${supabaseAnonKey}`
+    <script>
+        const supabaseUrl = "https://retwfjodylxmdqxhupbz.supabase.co";
+        const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJldHdmam9keWx4bWRxeGh1cGJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyMjkwOTIsImV4cCI6MjA4OTgwNTA5Mn0.GpuCY3K2yeepTek0yPWRC1SEotUetDO9NJgr95OnPYw";
+        const userId = "damianox";
+
+        async function loadBalance() {
+            try {
+                const res = await fetch(`${supabaseUrl}/rest/v1/users?id=eq.${userId}`, {
+                    headers: {
+                        apikey: supabaseAnonKey,
+                        "Authorization": `Bearer ${supabaseAnonKey}`
+                    }
+                });
+                const data = await res.json();
+                const balanceEl = document.getElementById("balance");
+                balanceEl.innerText = (data[0]?.balance ?? 0) + " pkt";
+                balanceEl.classList.remove("loading");
+            } catch (err) {
+                document.getElementById("balance").innerText = "Błąd";
+            }
         }
-      });
-      const data = await res.json();
-      document.getElementById("balance").innerText = data[0]?.balance ?? 0;
-    }
 
-    loadBalance();
+        loadBalance();
 
-    // 2️⃣ Wstaw iframe AdGem
-    const appId = "32197"; // Twój App ID z AdGem
-  const offerwallUrl = `https://adunits.adgem.com/wall?appid=${appId}&playerid=damianox`;
-    document.getElementById("offerwall").src = offerwallUrl;
-  </script>
+        // AdGem Config
+        const appId = "32197";
+        const offerwallUrl = `https://adunits.adgem.com/wall?appid=${appId}&playerid=${userId}`;
+        document.getElementById("offerwall").src = offerwallUrl;
+    </script>
 </body>
 </html>
