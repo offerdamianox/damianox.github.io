@@ -4,19 +4,67 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Zarabiaj punkty z AdGem</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f7fa;
+      color: #333;
+      margin: 0;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 10px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    header h1 {
+      color: #4caf50;
+    }
+
+    iframe {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      width: 100%;
+      height: 600px;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 30px;
+      color: #888;
+      font-size: 14px;
+    }
+  </style>
 </head>
 <body>
-  <h1>💎 Twoje punkty</h1>
-  <p>Saldo: <span id="balance">Ładowanie...</span></p>
+  <div class="container">
+    <header>
+      <h1>💎 Twoje punkty</h1>
+      <p>Saldo: <span id="balance">Ładowanie...</span></p>
+    </header>
 
-  <!-- Offerwall AdGem -->
-  <iframe src="https://wall.adgem.com/?user_id=USER_ID" width="100%" height="600"></iframe>
+    <main>
+      <!-- AdGem iframe -->
+      <iframe id="offerwall" src=""></iframe>
+    </main>
+
+    <footer>© 2026 Twoja Firma</footer>
+  </div>
 
   <script>
-    const userId = "USER_ID"; // ten sam, którego używasz w iframe
+    // Twój Supabase projekt
     const supabaseUrl = "https://retwfjodylxmdqxhupbz.supabase.co";
-    const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJldHdmam9keWx4bWRxeGh1cGJ6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzQyMjkwOTIsImV4cCI6MjA4OTgwNTA5Mn0.GpuCY3K2yeepTek0yPWRC1SEotUetDO9NJgr95OnPYw"; // z API Keys → anon key
+    const supabaseAnonKey = "TU_ANON_KEY_DO_FRONTEND"; // z API Keys → anon key
+    const userId = "USER_ID"; // identyfikator użytkownika w Supabase i AdGem
 
+    // 1️⃣ Pobierz saldo użytkownika z Supabase
     async function loadBalance() {
       const res = await fetch(`${supabaseUrl}/rest/v1/users?id=eq.${userId}`, {
         headers: {
@@ -29,6 +77,11 @@
     }
 
     loadBalance();
+
+    // 2️⃣ Wstaw iframe AdGem
+    const appId = "32197"; // Twój App ID z AdGem
+    const offerwallUrl = `https://adunits.adgem.com/wall?appid=${appId}&playerid=${userId}`;
+    document.getElementById("offerwall").src = offerwallUrl;
   </script>
 </body>
 </html>
